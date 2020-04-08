@@ -1,0 +1,1 @@
+console.log("It works, even hot reload! Test2");

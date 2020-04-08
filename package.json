@@ -1,0 +1,9 @@
+{
+  "name": "simple-threejs-3d",
+  "version": "1.0.0",
+  "description": "A simple Web3D starter pack using threejs with shader, camera and light use.",
+  "main": "index.js",
+  "repository": "git@github.com:varun-d/simple-threejs-3d.git",
+  "author": "Varun D <varun@thisnameless.com>",
+  "license": "MIT"
+}

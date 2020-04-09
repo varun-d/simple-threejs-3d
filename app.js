@@ -7,18 +7,22 @@ const ENABLE_ORBIT_CONTROLS = true; // Enable this to move around the sphere
 const DEBUG_MOUSE = false; // Enable this to see mouse movement in console.log
 const DEBUG_SHOW_GRID = false;
 const AUTO_ROTATE_VAL = 0.005; // Speed of sphere rotation
-const SPH_PRIM_COLOR = 0xfe22fe;
+const SPH_PRIM_COLOR = null;
+const MATERIAL_ROUGHNESS = 2;
+const MATERIAL_METALNESS = 0.9;
 
 /* Load all texture files upfront. Add files folder like /assets/texture */
 const TXTR_NORM = require('./assets/texture/Slate_Rock_001_NORM.jpg');
 const TXTR_ROUGH = require('./assets/texture/Slate_Rock_001_ROUGH.jpg');
 const TXTR_COLOR = require('./assets/texture/Slate_Rock_001_COLOR.jpg');
+const TXTR_DISP = require('./assets/texture/Slate_Rock_001_DISP.png');
 const TXTR_OCCL = require('./assets/texture/Slate_Rock_001_OCC.jpg');
-const TXTR_NORM2 = require('./assets/texture2/Ground_Forest_003_normal.jpg');
-const TXTR_ROUGH2 = require('./assets/texture2/Ground_Forest_003_ROUGH.jpg');
-const TXTR_COLOR2 = require('./assets/texture2/Ground_Forest_003_baseColor.jpg');
-const TXTR_OCCL2 = require('./assets/texture2/Ground_Forest_003_ambientOcclusion.jpg');
-const TXTR_DISP = require('./assets/texture2/Ground_Forest_003_height.png');
+
+const TXTR_NORM2 = require('./assets/texture3/Concrete_Wall_005_Normal.jpg');
+const TXTR_ROUGH2 = require('./assets/texture3/Concrete_Wall_005_Roughness.jpg');
+const TXTR_COLOR2 = require('./assets/texture3/Concrete_Wall_005_Base Color.jpg');
+const TXTR_OCCL2 = require('./assets/texture3/Concrete_Wall_005_Ambient Occlusion.jpg');
+const TXTR_DISP2 = require('./assets/texture3/Concrete_Wall_005_Height.png');
 
 /* Variables for world */
 var scene, renderer, camera;
@@ -82,7 +86,7 @@ scene.add(mouse_light);
     I am using wrong textures, but they work fine
     Texture Maps Explained - Essential for All Texture Artists: https://www.youtube.com/watch?v=ZOHNRlrd1Ak
 */
-var tex_disp = new THREE.TextureLoader().load( TXTR_NORM );
+var tex_disp = new THREE.TextureLoader().load( TXTR_DISP );
 tex_disp.wrapS = THREE.RepeatWrapping;
 tex_disp.wrapT = THREE.RepeatWrapping;
 var tex_norm = new THREE.TextureLoader().load( TXTR_NORM );
@@ -109,8 +113,8 @@ material.map = tex_color;
 material.emissiveMap = tex_color;
 material.aoMap = tex_ao;
 // These settings can change the experience
-material.roughness = 1;
-material.metalness = 0.6;
+material.roughness = MATERIAL_ROUGHNESS;
+material.metalness = MATERIAL_METALNESS;
 
 /*
     The Object: Sphere combined into something that can be added into the scene.

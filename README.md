@@ -17,3 +17,10 @@ Using parcel for packaging and testing
 
 ### Run
 ```yarn dev```
+
+Uses parcel's inbuild dev server for hot reloading.
+
+### Build
+```yarn build```
+
+Uses parcel's bundle manager. Find your final files in /dist

@@ -1,5 +1,13 @@
 // Import the three.js module
 import * as THREE from 'three';
+import {OrbitControls} from "./node_modules/three/examples/jsm/controls/OrbitControls";
+
+/* Some global settings */
+const ENABLE_ORBIT_CONTROLS = true; // Enable this to move around the sphere
+const DEBUG_MOUSE = false; // Enable this to see mouse movement in console.log
+const DEBUG_SHOW_GRID = false;
+const AUTO_ROTATE_VAL = 0.005; // Speed of sphere rotation
+const SPH_PRIM_COLOR = 0xfe22fe;
 
 /* Load all texture files upfront. Add files folder like /assets/texture */
 const TXTR_NORM = require('./assets/texture/Slate_Rock_001_NORM.jpg');
@@ -22,6 +30,7 @@ renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio( window.devicePixelRatio );
 document.body.appendChild(renderer.domElement); // Add the renderer to our HTML
+mouse = new THREE.Vector2(); // Enable mouse vector
 
 /*
     Renderer settings for shadows and lights
@@ -63,7 +72,7 @@ scene.add(p_light2);
 /*
     Light on the mouse pointer for you to move. Pull in towards you (z value) by 15.
 */
-var mouse_light = createSpotLight(0xffffff, 0, 0, 15, 1000);
+var mouse_light = createSpotLight(0xffffff, 0, 0, 15, 1500);
 scene.add(mouse_light);
 
 /*
@@ -88,7 +97,9 @@ var tex_ao = new THREE.TextureLoader().load( TXTR_OCCL );
     Texture Maps Explained - Essential for All Texture Artists: https://www.youtube.com/watch?v=ZOHNRlrd1Ak
 */
 var geo1 = new THREE.SphereGeometry(8, 28, 28);
-var material = new THREE.MeshStandardMaterial( { color: 0xff00ff} );
+var material = new THREE.MeshStandardMaterial({
+    color: SPH_PRIM_COLOR // Set primary color of the sphere!
+});
 // Apply textures
 material.displacementMap = tex_disp;
 material.normalMap = tex_norm;
@@ -111,46 +122,35 @@ sphere.castShadow = true;
 sphere.receiveShadow = true;
 scene.add( sphere ); // Finally added to the scene
 
-/*
-    Object: Plane
-    Using this to test sometimes.
-    Uncomment scene.add to add the plane.
-*/
-var plane1 = new THREE.PlaneGeometry(100, 100);
-var plane1_mat = new THREE.MeshStandardMaterial({color: 0xffffff, side: THREE.DoubleSide, roughness: 0.65});
-plane1_mat.roughness = 0.15;
-plane1_mat.metalness = 0.4;
-var plane_mesh = new THREE.Mesh(plane1, plane1_mat);
-plane_mesh.receiveShadow = true;
-plane_mesh.name = "plane";
-plane_mesh.rotation.x = Math.PI/2;
-// scene.add( plane_mesh );
 
+/* DEBUG SETTINGS */
 
 /*
-    HELPERS FUNCTIONS
+    Obitcontrols. If available, you can control your scene
+    import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
 */
-// controls = new THREE.OrbitControls(camera, renderer.domElement);
-// var gridHelper = new THREE.GridHelper( 10, 20 );
-// scene.add( gridHelper );
+if (ENABLE_ORBIT_CONTROLS) {
+    new OrbitControls(camera, renderer.domElement);
+}
 
-// Raycaster: Mouse check
-// raycaster = new THREE.Raycaster();
-mouse = new THREE.Vector2();
+if (DEBUG_SHOW_GRID) {
+    var gridHelper = new THREE.GridHelper( 100, 20 );
+    scene.add( gridHelper );
+}
 
-// Event Listeners
+/* Event Listeners */
 window.addEventListener('resize', onWindowResize, false);
 window.addEventListener('deviceorientation', onDeviceMove, false);
 document.addEventListener('mousemove', onMouseMove, false);
 
-/* All functions */
-
+// On resize keep things stable
 function onWindowResize() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     camera.aspect = window.innerWidth/window.innerHeight;
     camera.updateProjectionMatrix();
 }
 
+// On mouse move, move the lights or debug mouse
 function onMouseMove(event) {
     event.preventDefault();
     mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
@@ -159,24 +159,24 @@ function onMouseMove(event) {
     mouse_light.position.x = 12 * mouse.x;
     mouse_light.position.y = 12 * mouse.y;
 
-    // console.log(mouse);
-    // raycaster.setFromCamera(mouse, camera);
-
-    // To check for intersection
-    // var intersects = raycaster.intersectObjects(scene.children, true);
-    // for (var i = 0; i < intersects.length; i++){
-    //     console.log(intersects[i]);
-        
-    // }
+    if (DEBUG_MOUSE) {
+        var raycaster = new THREE.Raycaster();
+        var intersects = raycaster.intersectObjects(scene.children, true);
+        for (var i = 0; i < intersects.length; i++){
+            console.log(intersects[i]);
+        }
+        console.log(mouse);
+        raycaster.setFromCamera(mouse, camera);
+    }
 }
 
-// For device orientation
+/* This isn't working on Android and Apple. Can someone help with this? */
 function onDeviceMove(event) {
     mouse_light.position.x = event.alpha * 0.4;
     mouse_light.position.y = (event.beta - 60) / 1.66;
 }
 
-// Light helper function
+/* Create light helper function */
 function createSpotLight(color, x, y, z, power) {
     var _light = new THREE.SpotLight(color);
     _light.intensity = 2;
@@ -188,10 +188,10 @@ function createSpotLight(color, x, y, z, power) {
     return _light;
 }
 
-// Render & Animation
+/* Finally render and animate */
 function animate() {
     my_sphere = scene.getObjectByName('sphere');
-    my_sphere.rotation.y += 0.005;
+    my_sphere.rotation.y += AUTO_ROTATE_VAL; // Slowly auto rotate
     // controls.update();
     requestAnimationFrame(animate);
     renderer.render(scene, camera);

@@ -3,7 +3,7 @@ A simple threejs based template for rotating 3D shpere with some sample texture.
 New coders are welcome to play with this repo.
 
 # Live Example
-[Nameless Co](https:///www.thisnameless.com)
+[Nameless Co](https:///thisnameless.com)
 
 # Usage
 
